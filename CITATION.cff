@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use PicShot, please cite it as below."
+title: PicShot
+type: software
+authors:
+  - name: M003aad
+version: "1.0"
+license: AGPL-3.0-only
+repository-code: "https://github.com/M003aad/PicShot"

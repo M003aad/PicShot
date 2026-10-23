@@ -1,0 +1,48 @@
+name: Package release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Package extension
+        run: |
+          zip PicShot.zip \
+            manifest.json \
+            background.js \
+            fullscreen.js \
+            content.js \
+            popup.html \
+            popup.js \
+            popup.css \
+            icons/icon128.png
+
+      - name: Verify package contains only runtime files
+        run: |
+          expected="$(printf '%s\n' \
+            manifest.json \
+            background.js \
+            fullscreen.js \
+            content.js \
+            popup.html \
+            popup.js \
+            popup.css \
+            icons/icon128.png | sort)"
+          actual="$(unzip -Z1 PicShot.zip | sort)"
+          diff -u <(printf '%s\n' "$expected") <(printf '%s\n' "$actual")
+
+      - name: Attach archive to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: PicShot.zip
+          fail_on_unmatched_files: true

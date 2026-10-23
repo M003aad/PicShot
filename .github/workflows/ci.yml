@@ -1,0 +1,30 @@
+name: Extension validation
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install ESLint
+        run: npm install --global eslint@9
+
+      - name: Lint JavaScript
+        run: eslint .
+
+      - name: Validate extension manifest and files
+        run: >-
+          node -e "const fs=require('node:fs'); const m=JSON.parse(fs.readFileSync('manifest.json','utf8')); const paths=[m.background.service_worker,m.action.default_popup,...Object.values(m.icons),'fullscreen.js','content.js']; for (const p of paths) if (!fs.existsSync(p)) throw new Error('Missing extension file: '+p); if (m.manifest_version!==3) throw new Error('Expected Manifest V3'); console.log('Manifest and extension files are valid.');"
